@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #333;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            color: #4e54c8;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form input:focus {
+            border-color: #4e54c8;
+            outline: none;
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .login-form button:hover {
+            background: #3a3f9e;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background: #4e54c8;
+            color: white;
+            padding: 1.5rem;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-menu a:hover {
+            color: #ccc;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .card h2 {
+            margin-bottom: 1.5rem;
+            color: #4e54c8;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #4e54c8;
+            outline: none;
+        }
+
+        .form-group button {
+            background: #4e54c8;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background: #3a3f9e;
+        }
+
+        .student-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .student-list th,
+        .student-list td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .student-list th {
+            background: #4e54c8;
+            color: white;
+        }
+
+        .student-list tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4e54c8;
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>D.A.V PUBLIC SCHOOL</h1>
+            </div>
+            <form id="loginForm">
+                <div class="login-form">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Dashboard</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#addStudent">Add Student</a></li>
+                <li><a href="#removeStudent">Remove Student</a></li>
+                <li><a href="#editStudent">Edit Student</a></li>
+                <li><a href="#removeAllStudents">Remove All Students</a></li>
+                <li><a href="#showStudentList">Show Student List</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <!-- Add Student Card -->
+            <div class="card" id="addStudent">
+                <h2>Add Student</h2>
+                <form id="addStudentForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="rollNumber">Roll Number</label>
+                            <input type="text" id="rollNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="className">Class</label>
+                            <select id="className" required>
+                                <option value="">Select Class</option>
+                                <option value="1">Class 1</option>
+                                <option value="2">Class 2</option>
+                                <option value="3">Class 3</option>
+                                <option value="4">Class 4</option>
+                                <option value="5">Class 5</option>
+                                <option value="6">Class 6</option>
+                                <option value="7">Class 7</option>
+                                <option value="8">Class 8</option>
+                                <option value="9">Class 9</option>
+                                <option value="10">Class 10</option>
+                                <option value="11">Class 11</option>
+                                <option value="12">Class 12</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                    </div>
+                    <button type="submit">Add Student</button>
+                </form>
+            </div>
+
+            <!-- Remove Student Card -->
+            <div class="card" id="removeStudent">
+                <h2>Remove Student</h2>
+                <form id="removeStudentForm">
+                    <div class="form-group">
+                        <label for="rollNumberRemove">Roll Number</label>
+                        <input type="text" id="rollNumberRemove" required>
+                    </div>
+                    <button type="submit">Remove Student</button>
+                </form>
+            </div>
+
+            <!-- Edit Student Card -->
+            <div class="card" id="editStudent">
+                <h2>Edit Student</h2>
+                <form id="editStudentForm">
+                    <div class="form-group">
+                        <label for="rollNumberEdit">Roll Number</label>
+                        <input type="text" id="rollNumberEdit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nameEdit">Name</label>
+                        <input type="text" id="nameEdit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailEdit">Email</label>
+                        <input type="email" id="emailEdit" required>
+                    </div>
+                    <button type="submit">Update Student</button>
+                </form>
+            </div>
+
+            <!-- Remove All Students Card -->
+            <div class="card" id="removeAllStudents">
+                <h2>Remove All Students</h2>
+                <form id="removeAllStudentsForm">
+                    <button type="submit" style="background: #ff4444;">Remove All Students</button>
+                </form>
+            </div>
+
+            <!-- Show Student List Card -->
+            <div class="card student-list" id="showStudentList">
+                <h2>Student List</h2>
+                <div id="studentList">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Class</th>
+                                <th>Gender</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentListBody">
+                            <!-- Student list will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Default username and password
+        const DEFAULT_USERNAME = "admin";
+        const DEFAULT_PASSWORD = "1234";
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === DEFAULT_USERNAME && password === DEFAULT_PASSWORD) {
+                showToast('Login successful!', 'success');
+                setTimeout(() => {
+                    document.querySelector('.login-container').style.display = 'none';
+                    document.querySelector('.dashboard').style.display = 'flex';
+                }, 1000);
+            } else {
+                showToast('Invalid username or password!', 'error');
+            }
+        });
+
+        // Show/hide sections based on sidebar navigation
+        document.querySelectorAll('.sidebar-menu a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                document.querySelectorAll('.card, .student-list').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.querySelector(targetId).style.display = 'block';
+            });
+        });
+
+        // Add student functionality
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const rollNumber = document.getElementById('rollNumber').value;
+            const age = document.getElementById('age').value;
+            const className = document.getElementById('className').value;
+            const gender = document.getElementById('gender').value;
+            const email = document.getElementById('email').value;
+
+            if (name && rollNumber && age && className && gender && email) {
+                let students = JSON.parse(localStorage.getItem('students')) || [];
+                students.push({
+                    rollNumber: rollNumber,
+                    name: name,
+                    age: age,
+                    className: className,
+                    gender: gender,
+                    email: email
+                });
+                localStorage.setItem('students', JSON.stringify(students));
+                showToast('Student added successfully!', 'success');
+                this.reset();
+                updateStudentList();
+            } else {
+                showToast('Please fill in all fields!', 'error');
+            }
+        });
+
+        // Remove student functionality
+        document.getElementById('removeStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const rollNumber = document.getElementById('rollNumberRemove').value;
+
+            if (rollNumber) {
+                let students = JSON.parse(localStorage.getItem('students')) || [];
+                students = students.filter(student => student.rollNumber !== rollNumber);
+                localStorage.setItem('students', JSON.stringify(students));
+                showToast('Student removed successfully!', 'success');
+                this.reset();
+                updateStudentList();
+            } else {
+                showToast('Please enter roll number!', 'error');
+            }
+        });
+
+        // Edit student functionality
+        document.getElementById('editStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const rollNumber = document.getElementById('rollNumberEdit').value;
+            const name = document.getElementById('nameEdit').value;
+            const email = document.getElementById('emailEdit').value;
+
+            if (rollNumber && name && email) {
+                let students = JSON.parse(localStorage.getItem('students')) || [];
+                const index = students.findIndex(student => student.rollNumber === rollNumber);
+                if (index !== -1) {
+                    students[index] = {
+                        ...students[index],
+                        name: name,
+                        email: email
+                    };
+                    localStorage.setItem('students', JSON.stringify(students));
+                    showToast('Student updated successfully!', 'success');
+                    this.reset();
+                    updateStudentList();
+                } else {
+                    showToast('Student not found!', 'error');
+                }
+            } else {
+                showToast('Please fill in all fields!', 'error');
+            }
+        });
+
+        // Remove all students functionality
+        document.getElementById('removeAllStudentsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to remove all students?')) {
+                localStorage.removeItem('students');
+                showToast('All students removed successfully!', 'success');
+                updateStudentList();
+            }
+        });
+
+        // Function to update student list display
+        function updateStudentList() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const studentListBody = document.getElementById('studentListBody');
+            studentListBody.innerHTML = '';
+
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.rollNumber}</td>
+                    <td>${student.name}</td>
+                    <td>${student.age}</td>
+                    <td>Class ${student.className}</td>
+                    <td>${student.gender}</td>
+                    <td>${student.email}</td>
+                `;
+                studentListBody.appendChild(row);
+            });
+        }
+
+        // Toast notification function
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.backgroundColor = type === 'success' ? '#4e54c8' : '#ff4444';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Initialize student list on page load
+        window.onload = function() {
+            updateStudentList();
+        };
+    </script>
+</body>
+</html>
